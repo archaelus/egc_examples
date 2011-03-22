@@ -1,0 +1,10 @@
+#!/usr/bin/env escript
+
+main(_) ->
+    timer:sleep(50),
+    io:format("Self: ~p, links: ~p~n", [self(), element(2, process_info(self(), links))]),
+    Init = whereis(init),
+    io:format("Init: ~p, links: ~p~n", [Init, element(2, process_info(Init, links))]),
+    c:i(),    
+    erlang:halt(0).
+

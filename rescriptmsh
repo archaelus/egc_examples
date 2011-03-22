@@ -1,0 +1,35 @@
+#!/usr/bin/env escript
+%%! -noshell -noinput
+-define(ME, filename:basename(escript:script_name())).
+
+main(["remsh", Node, Cookie]) ->
+    net_kernel:start([my_name(), longnames]),
+    erlang:set_cookie(my_name(), list_to_atom(Cookie)),
+    Target = list_to_atom(Node),
+    case net_adm:ping(Target) of
+        pong ->
+            process_flag(trap_exit, true),
+            Shell = user_drv:start(['tty_sl -c -e',{Target,shell,start,[]}]),
+            true = erlang:link(Shell),
+            io:format("Grabbed a remote shell on ~p~n.", [Target]),
+            receive
+                {'EXIT', Shell, _} -> ok
+            end,
+            halt(0);
+        Else ->
+            io:format("~s: ~s ~p~n", [?ME, Node, Else]),
+            halt(1)
+    end;
+main(_) ->
+    io:format("~s: remsh <Node> <Cookie>~n"
+              "\tAttempt to start a remote shell on the erlang node <Node>"
+              " using the erlang distribution cookie <Cookie>.~n",
+              [?ME]),
+    halt(0).
+
+
+my_name() ->
+    Localhost = net_adm:localhost(),
+    list_to_atom(?ME ++ "@" ++ Localhost).
+
+

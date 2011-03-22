@@ -1,0 +1,6 @@
+#!/usr/bin/env escript
+
+main(_) ->
+    io:format("Module: ~p ~p~n", [?MODULE, erlang:now()]),
+    catch throw(cheating),
+    io:format("Stack: ~p~n", [erlang:get_stacktrace()]).

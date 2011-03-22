@@ -1,0 +1,24 @@
+#!/usr/bin/env escript
+
+-define(ME, filename:basename(escript:script_name())).
+
+main(["ping", Node]) ->
+    net_kernel:start([my_name(), longnames]),
+    case net_adm:ping(list_to_atom(Node)) of
+        ping ->
+            io:format("~s: ~s ~p~n", [?ME, Node, ping]),
+            halt(0);
+        Else ->
+            io:format("~s: ~s ~p~n", [?ME, Node, Else]),
+            halt(1)
+    end;
+main(_) ->
+    io:format("~s: ping <Node>~n"
+              "\tAttempt to contact the erlang node <Node>.~n",
+              [?ME]),
+    halt(0).
+
+
+my_name() ->
+    Localhost = net_adm:localhost(),
+    list_to_atom(?ME ++ "@" ++ Localhost).

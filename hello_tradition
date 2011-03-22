@@ -1,0 +1,14 @@
+#!/usr/bin/env escript
+
+-define(ME, filename:basename(escript:script_name())).
+
+main(["greet", Name]) ->
+    io:format("Hello ~s, I'm ~s.~n",
+              [Name, ?ME]),
+    halt(0);
+
+main(_) ->
+    io:format("~s: greet <name>~n"
+              "\tPrint out a greeting for <name>~n",
+              [?ME]),
+    halt(0).

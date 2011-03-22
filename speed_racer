@@ -1,0 +1,24 @@
+#!/usr/bin/env escript
+
+-module(slide6).
+-mode(compile).
+%-compile(native).
+
+main(_) ->
+    io:format("Escript! Pointlessly Fast!~n", []),
+    case code:which(?MODULE) of
+        non_existing ->
+            ok;
+        _ ->
+            io:format("Module: ~p~n\t~p~n", [?MODULE, ?MODULE:module_info()])
+    end,
+    catch throw(cheating),
+    io:format("Stack: ~p~n", [erlang:get_stacktrace()]),
+    Count = 100000,
+    {US,ok} = timer:tc(erlang, apply, [ fun (N) -> spin_loop(N) end, [Count] ]),
+    io:format("Spun ~p times in ~p us.~n", [Count, US]),
+    erlang:halt(0).
+
+spin_loop(0) -> ok;
+spin_loop(N) ->
+    spin_loop(N-1).

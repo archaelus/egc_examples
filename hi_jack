@@ -1,0 +1,31 @@
+#!/usr/bin/env escript
+
+-define(ME, filename:basename(escript:script_name())).
+
+main(["ping", Node, Cookie]) ->
+    net_kernel:start([my_name(), longnames]),
+    erlang:set_cookie(my_name(), list_to_atom(Cookie)),
+    Target = list_to_atom(Node),
+    case net_adm:ping(Target) of
+        pong ->
+            io:format(rpc:call(Target, erlang, whereis, [user]),
+                      "Hello from ~p.~n", [node()]),
+            io:format("~s: ~s ~p~n", [?ME, Target, pong]),
+            halt(0);
+        Else ->
+            io:format("~s: ~s ~p~n", [?ME, Node, Else]),
+            halt(1)
+    end;
+main(_) ->
+    io:format("~s: ping <Node> <Cookie>~n"
+              "\tAttempt to contact the erlang node <Node>"
+              " using the erlang distribution cookie <Cookie>.~n",
+              [?ME]),
+    halt(0).
+
+
+my_name() ->
+    Localhost = net_adm:localhost(),
+    list_to_atom(?ME ++ "@" ++ Localhost).
+
+
