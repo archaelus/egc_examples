@@ -1,0 +1,30 @@
+#!/usr/bin/env escript
+
+main([ Script ]) ->
+    case escript:extract(Script, []) of
+        {ok, Info} ->
+            io:format("Shebang: ~p~n", [proplists:get_value(shebang, Info)]),
+            io:format("Comment: ~p~n", [proplists:get_value(comment, Info)]),
+            io:format("Emulator arguments: ~p~n", [proplists:get_value(emu_args, Info)]),
+            case proplists:get_value(source, Info) of
+                Src when is_binary(Src) ->
+                    io:format("Source:~n~s~n", [Src]);
+                _ -> ok
+            end,
+            case proplists:get_value(archive, Info) of
+                Zip when is_binary(Zip) ->
+                    io:format("Archive contents:~n", []),
+                    {ok, ZipFile} = zip:list_dir(Zip),
+                    [ io:format("\t~s~n", [ element(2, File) ])
+                      || File <- ZipFile,
+                         element(1, File) =:= zip_file ];
+                _ -> ok
+            end,
+            ok;
+        Err ->
+            io:format("Couldn't parse ~s: ~p~n", [Script, Err])
+    end;
+main(_) ->
+    io:format("~s: <scriptname>~nExamine the contents of an escript.~n",
+              [filename:basename(escript:script_name())]),
+    erlang:halt(0).

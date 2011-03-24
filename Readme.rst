@@ -23,3 +23,5 @@ rescriptmsh
   Remote shell (programmatic remsh)
 ancestors
   Rapid boot (dump processes in escript)
+examine
+  Describe a given escript
